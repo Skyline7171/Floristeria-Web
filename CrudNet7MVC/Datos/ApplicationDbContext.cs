@@ -1,4 +1,5 @@
-﻿using FloristeriaWeb.Models;
+﻿using System.Diagnostics.Contracts;
+using FloristeriaWeb.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FloristeriaWeb.Datos
@@ -11,7 +12,14 @@ namespace FloristeriaWeb.Datos
         }
 
         // Agregar los modelos aquí
-        public DbSet<Contacto> Contacto { get; set; }
+        public DbSet<Categoria> Categoria { get; set; }
+        public DbSet<Departamento> Departamento { get; set; }
+        public DbSet<DetalleOrden> DetalleOrden { get; set; }
+        public DbSet<Estado> Estado { get; set; }
+        public DbSet<Flor> Flor { get; set; }
+        public DbSet<Municipio> Municipio { get; set; }
+        public DbSet<Orden> Orden { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
