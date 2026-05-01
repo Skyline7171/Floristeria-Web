@@ -1,10 +1,10 @@
 using System.Diagnostics;
-using CrudNet7MVC.Datos;
-using CrudNet7MVC.Models;
+using FloristeriaWeb.Datos;
+using FloristeriaWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CrudNet7MVC.Controllers
+namespace FloristeriaWeb.Controllers
 {
     public class InicioController : Controller
     {

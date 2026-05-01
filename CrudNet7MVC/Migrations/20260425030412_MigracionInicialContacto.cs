@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CrudNet7MVC.Migrations
+namespace FloristeriaWeb.Migrations
 {
     /// <inheritdoc />
     public partial class MigracionInicialContacto : Migration

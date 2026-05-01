@@ -1,4 +1,4 @@
-namespace CrudNet7MVC.Models
+namespace FloristeriaWeb.Models
 {
     public class ErrorViewModel
     {

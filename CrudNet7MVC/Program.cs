@@ -1,4 +1,4 @@
-using CrudNet7MVC.Datos;
+using FloristeriaWeb.Datos;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

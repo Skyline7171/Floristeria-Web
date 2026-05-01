@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CrudNet7MVC.Models
+namespace FloristeriaWeb.Models
 {
     public class Contacto
     {
