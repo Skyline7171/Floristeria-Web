@@ -125,6 +125,8 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
             
             // Registro automático
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var nombreGoogle = info.Principal.FindFirstValue(ClaimTypes.Name); // Extraemos el nombre de Google
+
             if (email != null)
             {
                 var user = await _userManager.FindByEmailAsync(email);

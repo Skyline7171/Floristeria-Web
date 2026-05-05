@@ -1,4 +1,5 @@
 using FloristeriaWeb.Datos;
+using FloristeriaWeb.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ builder.Services.AddSession(options =>
 });
 
 // 1. Configuraci�n de Identity (Usa tus clases de contexto)
-builder.Services.AddDefaultIdentity<IdentityUser>(options => {
+builder.Services.AddDefaultIdentity<UsuarioAplicacion>(options => {
     options.SignIn.RequireConfirmedAccount = false; // Para desarrollo es más fácil así
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 6;

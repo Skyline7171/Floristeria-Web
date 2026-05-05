@@ -10,16 +10,43 @@
 				<div class="card-body">
 					<form asp-action="ProcesarOrden" id="formCheckout">
 						<div class="row g-3">
-							<div class="col-md-12">
-								<label class="form-label">Nombre Completo</label>
-								<input asp-for="NombreCliente" class="form-control" required="required" />
-							</div>
+
 							<div class="col-md-6">
-								<label class="form-label">Correo Electrónico</label>
-								<input asp-for="Email" class="form-control" required="required" />
+								<label class="form-label">
+									Nombre del Destinatario
+									<i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="Escribe el primer o segundo nombre de la persona que recibirá las flores."></i>
+								</label>
+								<input asp-for="NombreDestinatario" class="form-control" required="required" />
 							</div>
+
 							<div class="col-md-6">
-								<label class="form-label">Teléfono (Nicaragua)</label>
+								<label class="form-label">
+									Apellido del Destinatario
+									<i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="Escribe los apellidos de la persona que recibirá la entrega."></i>
+								</label>
+								<input asp-for="ApellidoDestinatario" class="form-control" required="required" />
+							</div>
+
+							<div class="col-md-6">
+								<label class="form-label">
+									Correo Electrónico
+									<i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="Este es el correo de tu cuenta donde enviaremos el comprobante de compra y los detalles de seguimiento."></i>
+								</label>
+								<input asp-for="Email" class="form-control bg-light" readonly="readonly" required="required" />
+
+								@if (User.Identity.IsAuthenticated)
+								{
+									<div class="form-text mt-1">
+										¿No es tu correo electrónico? <a asp-area="Identity" asp-page="/Account/Manage/Email" class="text-decoration-none">Cámbialo aquí</a>
+									</div>
+								}
+							</div>
+
+							<div class="col-md-6">
+								<label class="form-label">
+									Teléfono (Nicaragua)
+									<i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="Número de teléfono (tuyo o del destinatario). Será el que utilizaremos exclusivamente para comunicarnos ante cualquier imprevisto con la entrega."></i>
+								</label>
 								<input asp-for="Telefono"
 									   type="tel"
 									   class="form-control"
@@ -29,7 +56,6 @@
 									   required />
 							</div>
 
-							<!-- DROPDOWNS DEPENDIENTES -->
 							<div class="col-md-6">
 								<label class="form-label">Departamento</label>
 								<select asp-for="DepartamentoId" class="form-select" id="cboDepartamento" required="required"
@@ -46,7 +72,7 @@
 
 							<div class="col-md-12">
 								<label class="form-label">Dirección Exacta</label>
-								<textarea asp-for="Direccion" class="form-control" rows="3" required="required"></textarea>
+								<textarea asp-for="Direccion" class="form-control" rows="3" required="required" placeholder="Referencias de la casa o lugar de entrega..."></textarea>
 							</div>
 						</div>
 					</form>
@@ -55,7 +81,6 @@
 		</div>
 
 		<div class="col-md-4">
-			<!-- Resumen de Pago (PayPal pronto aquí) -->
 			<div class="card shadow border-0 text-center">
 				<div class="card-body">
 					<h5>Total a Pagar</h5>
@@ -80,6 +105,12 @@
 
 	<script>
 		$(document).ready(function () {
+			// INICIALIZAR LOS TOOLTIPS DE BOOTSTRAP
+			var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+			var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+				return new bootstrap.Tooltip(tooltipTriggerEl)
+			});
+
 			$("#cboDepartamento").change(function () {
 				var depId = $(this).val();
 				$("#cboMunicipio").empty().append('<option value="">Cargando...</option>');
@@ -98,7 +129,6 @@
 			const contenedorPaypal = document.getElementById('contenedor-paypal');
 			const mensajeValidacion = document.getElementById('mensaje-validacion');
 
-			// Función para validar
 			function validarFormulario() {
 				if (formulario.checkValidity()) {
 					$(contenedorPaypal).fadeIn();
@@ -109,31 +139,23 @@
 				}
 			}
 
-			// Escuchar cambios en CUALQUIER input o select del formulario
-			// El evento 'input' detecta cuando escriben, 'change' cuando eligen un municipio
 			$("#formCheckout input, #formCheckout select, #formCheckout textarea").on('input change', function () {
 				validarFormulario();
 			});
 
 			paypal.Buttons({
 				style: { color: 'gold', shape: 'pill', label: 'pay' },
-
-				// Configura el pago
 				createOrder: function(data, actions) {
 					return actions.order.create({
 						purchase_units: [{
 							amount: {
-								value: '@Model.Total.ToString("F2").Replace(",", ".")' // Formato decimal inglés
+								value: '@Model.Total.ToString("F2").Replace(",", ".")'
 							}
 						}]
 					});
 				},
-
-				// Se ejecuta cuando el cliente aprueba el pago
 				onApprove: function(data, actions) {
 					return actions.order.capture().then(function(detalles) {
-
-						// Enviamos el ID de transacción a nuestro servidor C#
 						fetch('/Ordenes/ConfirmarPago', {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },

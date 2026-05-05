@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace FloristeriaWeb.Datos
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<UsuarioAplicacion>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base (options)
         {

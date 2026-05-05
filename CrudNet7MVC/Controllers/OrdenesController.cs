@@ -6,6 +6,7 @@ using FloristeriaWeb.Datos;
 using FloristeriaWeb.Helpers;
 using FloristeriaWeb.Models;
 using FloristeriaWeb.Models.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,12 @@ namespace FloristeriaWeb.Controllers
     public class OrdenesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<UsuarioAplicacion> _userManager;
 
-        public OrdenesController(ApplicationDbContext context)
+        public OrdenesController(ApplicationDbContext context, UserManager<UsuarioAplicacion> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Ordenes
@@ -61,7 +64,7 @@ namespace FloristeriaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NombreCliente,Email,FechaOrden,Telefono,Total,EstadoPagoId,Direccion,MunicipioId,TransactionId")] Orden orden)
+        public async Task<IActionResult> Create([Bind("Id,NombreDestinatario,ApellidoDestinatario,Email,FechaOrden,Telefono,Total,EstadoPagoId,Direccion,MunicipioId,TransactionId")] Orden orden)
         {
             if (ModelState.IsValid)
             {
@@ -97,7 +100,7 @@ namespace FloristeriaWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NombreCliente,Email,FechaOrden,Telefono,Total,EstadoPagoId,Direccion,MunicipioId,TransactionId")] Orden orden)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NombreDestinatario,ApellidoDestinatario,Email,FechaOrden,Telefono,Total,EstadoPagoId,Direccion,MunicipioId,TransactionId")] Orden orden)
         {
             if (id != orden.Id)
             {
@@ -205,7 +208,8 @@ namespace FloristeriaWeb.Controllers
             // 2. Crear el objeto Orden para la DB
             var orden = new Orden
             {
-                NombreCliente = checkoutInfo.NombreCliente,
+                NombreDestinatario = checkoutInfo.NombreDestinatario,
+                ApellidoDestinatario = checkoutInfo.ApellidoDestinatario,
                 Email = checkoutInfo.Email,
                 Telefono = checkoutInfo.Telefono,
                 Direccion = checkoutInfo.Direccion,

@@ -6,7 +6,9 @@ namespace FloristeriaWeb.Models.ViewModels
     {
         // Datos del Cliente
         [Required(ErrorMessage = "El nombre es obligatorio")]
-        public string NombreCliente { get; set; } = string.Empty;
+        public string NombreDestinatario { get; set; }
+        [Required(ErrorMessage = "El apellido es obligatorio")]
+        public string ApellidoDestinatario { get; set; }
 
         [Required(ErrorMessage = "El correo es obligatorio")]
         [EmailAddress]

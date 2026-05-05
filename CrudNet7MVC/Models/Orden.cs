@@ -10,8 +10,13 @@ namespace FloristeriaWeb.Models
 
         [Required(ErrorMessage = "El nombre del cliente es obligatorio")]
         [StringLength(100, ErrorMessage = "El nombre no puede exceder los 100 caracteres")]
-        [Display(Name = "Cliente")]
-        public string NombreCliente { get; set; }
+        [Display(Name = "Nombre del destinatario")]
+        public string NombreDestinatario { get; set; }
+
+        [Required(ErrorMessage = "El apellido del cliente es obligatorio")]
+        [StringLength(100, ErrorMessage = "El apellido no puede exceder los 100 caracteres")]
+        [Display(Name = "Apellido del destinatario")]
+        public string ApellidoDestinatario { get; set; }
 
         [Required(ErrorMessage = "El correo es obligatorio")]
         [StringLength(256)]
