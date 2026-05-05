@@ -1,71 +1,105 @@
 ﻿@model IEnumerable<FloristeriaWeb.Models.Flor>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Inventario de Flores";
 }
 
-<h1>Index</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-flower3 text-success"></i> @ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Agregar Nueva Flor
+    </a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descripcion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Precio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Stock)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImagenUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Activo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoria)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descripcion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Precio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stock)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImagenUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Activo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoria.Nombre)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover align-middle" id="tablaFlores">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: 100px;">Imagen</th>
+                    <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+                    <th>@Html.DisplayNameFor(model => model.Categoria)</th>
+                    <th>@Html.DisplayNameFor(model => model.Precio)</th>
+                    <th>@Html.DisplayNameFor(model => model.Stock)</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                            {
+                                <img src="@item.ImagenUrl" alt="@item.Nombre" class="img-thumbnail shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center border rounded" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                                </div>
+                            }
+                        </td>
+                        <td>
+                            <strong>@Html.DisplayFor(modelItem => item.Nombre)</strong>
+                            <br />
+                            <small class="text-muted">@item.Descripcion</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info text-dark">@(item.Categoria?.Nombre ?? "General")</span>
+                        </td>   
+                        <td class="fw-bold text-success">
+                            C$ @item.Precio.ToString("N2")
+                        </td>
+                        <td>
+                            @if (item.Stock <= 5)
+                            {
+                                <span class="badge bg-danger" title="¡Stock Crítico!">@item.Stock unidades</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@item.Stock unidades</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.Activo)
+                            {
+                                <span class="text-success"><i class="bi bi-check-circle-fill"></i> Disponible</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted"><i class="bi bi-x-circle"></i> Oculto</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm" title="Detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablaFlores').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Spanish.json"
+                }
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

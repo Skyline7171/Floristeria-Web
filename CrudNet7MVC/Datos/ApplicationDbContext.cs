@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics.Contracts;
 using FloristeriaWeb.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace FloristeriaWeb.Datos
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base (options)
         {

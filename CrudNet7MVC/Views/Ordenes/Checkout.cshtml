@@ -1,0 +1,153 @@
+﻿@model FloristeriaWeb.Models.ViewModels.CheckoutVM
+
+<div class="container mt-5">
+	<div class="row">
+		<div class="col-md-8">
+			<div class="card shadow border-0">
+				<div class="card-header bg-dark text-white">
+					<h4 class="mb-0">Datos de Envío</h4>
+				</div>
+				<div class="card-body">
+					<form asp-action="ProcesarOrden" id="formCheckout">
+						<div class="row g-3">
+							<div class="col-md-12">
+								<label class="form-label">Nombre Completo</label>
+								<input asp-for="NombreCliente" class="form-control" required="required" />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Correo Electrónico</label>
+								<input asp-for="Email" class="form-control" required="required" />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Teléfono (Nicaragua)</label>
+								<input asp-for="Telefono"
+									   type="tel"
+									   class="form-control"
+									   placeholder="8888-8888"
+									   pattern="[2578][0-9]{7}"
+									   oninput="this.value = this.value.replace(/[^0-9-]/g, '')"
+									   required />
+							</div>
+
+							<!-- DROPDOWNS DEPENDIENTES -->
+							<div class="col-md-6">
+								<label class="form-label">Departamento</label>
+								<select asp-for="DepartamentoId" class="form-select" id="cboDepartamento" required="required"
+										asp-items="@(new SelectList(ViewBag.Departamentos, "Id", "Nombre"))">
+									<option value="">Seleccione Departamento...</option>
+								</select>
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Municipio</label>
+								<select asp-for="MunicipioId" class="form-select" id="cboMunicipio" required="required">
+									<option value="">Seleccione Municipio...</option>
+								</select>
+							</div>
+
+							<div class="col-md-12">
+								<label class="form-label">Dirección Exacta</label>
+								<textarea asp-for="Direccion" class="form-control" rows="3" required="required"></textarea>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<!-- Resumen de Pago (PayPal pronto aquí) -->
+			<div class="card shadow border-0 text-center">
+				<div class="card-body">
+					<h5>Total a Pagar</h5>
+					<h2 class="text-success fw-bold">C$ @Model.Total.ToString("N2")</h2>
+					<hr />
+					<div id="contenedor-paypal" style="display: none;">
+						<p class="text-primary small"><i class="bi bi-info-circle"></i> Todo listo. Ahora puedes pagar con PayPal</p>
+						<div id="paypal-button-container"></div>
+					</div>
+
+					<div id="mensaje-validacion" class="alert alert-warning">
+						<i class="bi bi-exclamation-triangle"></i> Por favor, completa todos los campos de envío para habilitar el pago.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="https://www.paypal.com/sdk/js?client-id=AUS_CfR7MYnimGA9ASbEYrP4L3wZBkx0r3qJm9qw22xvk3msz8PDVu-B4FbNhrv3mLpIH_mgrEvT6eWn&currency=USD"></script>
+
+	<script>
+		$(document).ready(function () {
+			$("#cboDepartamento").change(function () {
+				var depId = $(this).val();
+				$("#cboMunicipio").empty().append('<option value="">Cargando...</option>');
+
+				if (depId) {
+					$.getJSON('@Url.Action("GetMunicipios", "Ordenes")', { departamentoId: depId }, function (data) {
+						$("#cboMunicipio").empty().append('<option value="">Seleccione Municipio...</option>');
+						$.each(data, function (i, municipio) {
+							$("#cboMunicipio").append('<option value="' + municipio.id + '">' + municipio.nombre + '</option>');
+						});
+					});
+				}
+			});
+
+			const formulario = document.getElementById('formCheckout');
+			const contenedorPaypal = document.getElementById('contenedor-paypal');
+			const mensajeValidacion = document.getElementById('mensaje-validacion');
+
+			// Función para validar
+			function validarFormulario() {
+				if (formulario.checkValidity()) {
+					$(contenedorPaypal).fadeIn();
+					$(mensajeValidacion).hide();
+				} else {
+					$(contenedorPaypal).hide();
+					$(mensajeValidacion).show();
+				}
+			}
+
+			// Escuchar cambios en CUALQUIER input o select del formulario
+			// El evento 'input' detecta cuando escriben, 'change' cuando eligen un municipio
+			$("#formCheckout input, #formCheckout select, #formCheckout textarea").on('input change', function () {
+				validarFormulario();
+			});
+
+			paypal.Buttons({
+				style: { color: 'gold', shape: 'pill', label: 'pay' },
+
+				// Configura el pago
+				createOrder: function(data, actions) {
+					return actions.order.create({
+						purchase_units: [{
+							amount: {
+								value: '@Model.Total.ToString("F2").Replace(",", ".")' // Formato decimal inglés
+							}
+						}]
+					});
+				},
+
+				// Se ejecuta cuando el cliente aprueba el pago
+				onApprove: function(data, actions) {
+					return actions.order.capture().then(function(detalles) {
+
+						// Enviamos el ID de transacción a nuestro servidor C#
+						fetch('/Ordenes/ConfirmarPago', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								idTransaccion: detalles.id
+							})
+						}).then(response => {
+							if (response.ok) {
+								window.location.href = "/Ordenes/ConfirmacionExito";
+							}
+						});
+					});
+				}
+			}).render('#paypal-button-container');
+		});
+	</script>
+}

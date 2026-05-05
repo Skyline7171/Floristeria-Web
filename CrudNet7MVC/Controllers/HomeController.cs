@@ -1,21 +1,29 @@
 using System.Diagnostics;
+using FloristeriaWeb.Datos;
 using FloristeriaWeb.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace deleteafter.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            // Traemos solo las flores activas y que tengan stock
+            var flores = await _context.Flor
+                .Include(f => f.Categoria)
+                .Where(f => f.Activo && f.Stock > 0)
+                .ToListAsync();
+                
+            return View(flores);
         }
 
         public IActionResult Privacy()

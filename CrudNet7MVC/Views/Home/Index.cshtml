@@ -1,8 +1,72 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<FloristeriaWeb.Models.Flor>
+
+@{
+    ViewData["Title"] = "Nuestras Flores";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Banner de Bienvenida -->
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm border-0" style="background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://images.unsplash.com/photo-1526047932273-341f2a7631f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover;">
+    <div class="container-fluid py-5 text-center">
+        <h1 class="display-5 fw-bold text-dark">Lleva la frescura a tu hogar</h1>
+        <p class="col-md-8 fs-4 mx-auto">Explora nuestra colección exclusiva de flores cultivadas con amor en Nicaragua.</p>
+        <a href="#catalogo" class="btn btn-success btn-lg px-4">Ver Catálogo</a>
+    </div>
 </div>
+
+<div class="container" id="catalogo">
+    <h2 class="pb-2 border-bottom mb-4">Catálogo de Temporada</h2>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 transition-hover">
+                    <!-- Badge de Categoría -->
+                    <div class="position-absolute p-2">
+                        <span class="badge rounded-pill bg-dark opacity-75">@item.Categoria?.Nombre</span>
+                    </div>
+
+                    <!-- Imagen del Producto -->
+                    @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                    {
+                        <img src="@item.ImagenUrl" class="card-img-top" alt="@item.Nombre" style="height: 250px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <i class="bi bi-image text-white fs-1"></i>
+                        </div>
+                    }
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold">@item.Nombre</h5>
+                        <p class="card-text text-muted small flex-grow-1">
+                            @(item.Descripcion?.Length > 80 ? item.Descripcion.Substring(0, 80) + "..." : item.Descripcion)
+                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="fs-5 fw-bold text-success">C$ @item.Precio.ToString("N2")</span>
+                            <small class="text-muted">@item.Stock disp.</small>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-top-0 pb-3">
+                        <div class="d-grid gap-2">
+                            <a asp-controller="Carrito" asp-action="Agregar" asp-route-id="@item.Id" class="btn btn-outline-dark">
+                                <i class="bi bi-cart-plus"></i> Añadir al Carrito
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
+    }
+</style>
