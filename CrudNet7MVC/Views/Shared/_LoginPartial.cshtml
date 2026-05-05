@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using FloristeriaWeb.Helpers
+@using Microsoft.AspNetCore.Identity
 @inject SignInManager<UsuarioAplicacion> SignInManager
 @inject UserManager<UsuarioAplicacion> UserManager
 
@@ -14,6 +15,36 @@
                 <i class="bi bi-person-circle"></i> Hola, @nombreAMostrar!
             </a>
         </li>
+
+        <li class="nav-item me-3">
+            <a asp-controller="Carrito" asp-action="Index" class="btn btn-outline-dark position-relative" id="icono-carrito-nav">
+                <i class="bi bi-cart3 fs-5"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito-global">
+                    @(Context.Session.GetObjectFromJson<List<ElementoCarrito>>("CarritoFloreria")?.Sum(x => x.Cantidad) ?? 0)
+                </span>
+            </a>
+        </li>
+            
+        <style>
+            @@keyframes palpito {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.2);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            .animar-palpito {
+                animation: palpito 0.3s ease-in-out;
+            }
+        </style>
+
         <li class="nav-item">
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                 <button type="submit" class="nav-link btn btn-link text-white border-0">Cerrar Sesión</button>

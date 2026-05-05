@@ -26,6 +26,7 @@ builder.Services.AddDefaultIdentity<UsuarioAplicacion>(options => {
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
 })
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"]
@@ -67,5 +68,37 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// SEEDER DE ROLES Y USUARIO ADMINISTRADOR
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UsuarioAplicacion>>();
+
+    // 1. Asegurar que el rol Admin exista
+    string[] nombresRoles = { "Admin", "Cliente" };
+    foreach (var nombreRol in nombresRoles)
+    {
+        var elRolExiste = await roleManager.RoleExistsAsync(nombreRol);
+        if (!elRolExiste)
+        {
+            await roleManager.CreateAsync(new IdentityRole(nombreRol));
+        }
+    }
+
+    // 2. Asignar el rol Admin
+    var correoAdmin = "xpolargeist007x@gmail.com";
+    var usuarioAdmin = await userManager.FindByEmailAsync(correoAdmin);
+
+    if (usuarioAdmin != null)
+    {
+        // Verifica si el usuario ya tiene el rol para no duplicarlo
+        var yaEsAdmin = await userManager.IsInRoleAsync(usuarioAdmin, "Admin");
+        if (!yaEsAdmin)
+        {
+            await userManager.AddToRoleAsync(usuarioAdmin, "Admin");
+        }
+    }
+}
 
 app.Run();

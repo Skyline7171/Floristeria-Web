@@ -241,6 +241,19 @@ namespace FloristeriaWeb.Controllers
                     PrecioUnitario = item.Precio
                 };
                 _context.DetalleOrden.Add(detalle);
+
+                var florEnInventario = await _context.Flor.FindAsync(item.FlorId);
+                if (florEnInventario != null)
+                {
+                    // Restamos la cantidad comprada del stock actual
+                    florEnInventario.Stock -= item.Cantidad;
+
+                    // Medida de seguridad: Si por algún desfase el stock da negativo, lo nivelamos a 0
+                    if (florEnInventario.Stock < 0)
+                    {
+                        florEnInventario.Stock = 0;
+                    }
+                }
             }
             await _context.SaveChangesAsync();
 

@@ -46,7 +46,10 @@
 
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <span class="fs-5 fw-bold text-success">C$ @item.Precio.ToString("N2")</span>
-                            <small class="text-muted">@item.Stock disp.</small>
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <small class="text-muted">@item.Stock disp.</small>
+                            }
                         </div>
                     </div>
 
