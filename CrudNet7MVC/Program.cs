@@ -19,7 +19,7 @@ builder.Services.AddSession(options =>
 
 // 1. Configuraci�n de Identity (Usa tus clases de contexto)
 builder.Services.AddDefaultIdentity<IdentityUser>(options => {
-    options.SignIn.RequireConfirmedAccount = false; // Para desarrollo es m�s f�cil as�
+    options.SignIn.RequireConfirmedAccount = false; // Para desarrollo es más fácil así
     options.Password.RequireDigit = false;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;

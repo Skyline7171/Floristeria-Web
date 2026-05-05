@@ -2,11 +2,13 @@
 using FloristeriaWeb.Helpers;
 using FloristeriaWeb.Models;
 using FloristeriaWeb.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FloristeriaWeb.Controllers
 {
+    [Authorize]
     public class CarritoController : Controller
     {
         private readonly ApplicationDbContext _context;

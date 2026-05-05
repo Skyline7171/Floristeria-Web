@@ -122,20 +122,36 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("./Lockout");
             }
-            else
+            
+            // Registro automático
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (email != null)
             {
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
                 {
-                    Input = new InputModel
+                    // Creamos el usuario si no existe
+                    user = new IdentityUser { UserName = email, Email = email };
+
+                    // para confirmar el email automáticamente
+                    user.EmailConfirmed = true;
+
+                    var createResult = await _userManager.CreateAsync(user);
+                    if (!createResult.Succeeded)
                     {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                        // Si falla la creación (ej. contraseña muy corta, aunque aquí no aplica)
+                        return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                    }
                 }
-                return Page();
+
+                // Vinculamos y logueamos
+                await _userManager.AddLoginAsync(user, info);
+                await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+
+                return LocalRedirect(returnUrl);
             }
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
