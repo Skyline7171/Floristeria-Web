@@ -7,6 +7,7 @@ namespace FloristeriaWeb.Models
     {
         [Key]
         public int Id { get; set; }
+        public string UsuarioId { get; set; }
 
         [Required(ErrorMessage = "El nombre del cliente es obligatorio")]
         [StringLength(100, ErrorMessage = "El nombre no puede exceder los 100 caracteres")]

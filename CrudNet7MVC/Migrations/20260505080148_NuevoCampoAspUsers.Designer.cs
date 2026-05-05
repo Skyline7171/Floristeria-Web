@@ -4,6 +4,7 @@ using FloristeriaWeb.Datos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FloristeriaWeb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class AplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505080148_NuevoCampoAspUsers")]
+    partial class NuevoCampoAspUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,22 +214,12 @@ namespace FloristeriaWeb.Migrations
                         new
                         {
                             Id = 2,
-                            Nombre = "En preparación"
+                            Nombre = "Aprobado"
                         },
                         new
                         {
                             Id = 3,
-                            Nombre = "En camino"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Nombre = "Entregado"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Nombre = "Cancelado"
+                            Nombre = "Rechazado"
                         });
                 });
 
@@ -1257,10 +1250,6 @@ namespace FloristeriaWeb.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TransactionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UsuarioId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

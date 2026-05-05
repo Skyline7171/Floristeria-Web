@@ -236,8 +236,10 @@ namespace FloristeriaWeb.Datos
 
             modelBuilder.Entity<Estado>().HasData(
                 new Estado { Id = 1, Nombre = "Pendiente" },
-                new Estado { Id = 2, Nombre = "Aprobado" },
-                new Estado { Id = 3, Nombre = "Rechazado" }
+                new Estado { Id = 2, Nombre = "En preparación" },
+                new Estado { Id = 3, Nombre = "En camino" },
+                new Estado { Id = 4, Nombre = "Entregado" },
+                new Estado { Id = 5, Nombre = "Cancelado" }
             );
         }
     }

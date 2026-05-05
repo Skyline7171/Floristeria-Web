@@ -17,23 +17,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using FloristeriaWeb.Models;
 
 namespace FloristeriaWeb.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<UsuarioAplicacion> _signInManager;
+        private readonly UserManager<UsuarioAplicacion> _userManager;
+        private readonly IUserStore<UsuarioAplicacion> _userStore;
+        private readonly IUserEmailStore<UsuarioAplicacion> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
+            SignInManager<UsuarioAplicacion> signInManager,
+            UserManager<UsuarioAplicacion> userManager,
+            IUserStore<UsuarioAplicacion> userStore,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender)
         {
@@ -133,15 +134,18 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
                 if (user == null)
                 {
                     // Creamos el usuario si no existe
-                    user = new IdentityUser { UserName = email, Email = email };
-
-                    // para confirmar el email automáticamente
-                    user.EmailConfirmed = true;
+                    user = new UsuarioAplicacion
+                    {
+                        UserName = email,
+                        Email = email,
+                        NombreCompleto = nombreGoogle, // Guardamos el nombre obtenido de Google
+                        EmailConfirmed = true
+                    };
 
                     var createResult = await _userManager.CreateAsync(user);
                     if (!createResult.Succeeded)
                     {
-                        // Si falla la creación (ej. contraseña muy corta, aunque aquí no aplica)
+                        // Si falla la creación
                         return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
                     }
                 }
@@ -215,11 +219,11 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private UsuarioAplicacion CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<UsuarioAplicacion>();
             }
             catch
             {
@@ -229,13 +233,13 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<UsuarioAplicacion> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<UsuarioAplicacion>)_userStore;
         }
     }
 }

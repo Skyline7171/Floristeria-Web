@@ -1,13 +1,17 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<UsuarioAplicacion> SignInManager
+@inject UserManager<UsuarioAplicacion> UserManager
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
+        var usuario = await UserManager.GetUserAsync(User);
+        // Si tiene NombreCompleto usa ese, si no, usa el correo como respaldo
+        var nombreAMostrar = usuario?.NombreCompleto ?? User.Identity?.Name;
+
         <li class="nav-item">
             <a class="nav-link text-white" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
-                <i class="bi bi-person-circle"></i> Hola, @(UserManager.GetUserAsync(User).Result?.UserName)!
+                <i class="bi bi-person-circle"></i> Hola, @nombreAMostrar!
             </a>
         </li>
         <li class="nav-item">

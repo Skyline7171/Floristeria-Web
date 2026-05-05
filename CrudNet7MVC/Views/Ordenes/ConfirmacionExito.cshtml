@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "¡Compra Exitosa!";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow border-0 p-5 mx-auto" style="max-width: 600px;">
+        <div class="text-success display-1 mb-4">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h2 class="fw-bold mb-3">¡Gracias por tu compra!</h2>
+        <p class="text-muted fs-5">Tu pago ha sido procesado con éxito y la floristería ya está preparando tu orden.</p>
+
+        <div class="bg-light p-3 rounded my-4">
+            <span class="text-secondary d-block small text-uppercase">Código de Transacción</span>
+            <strong class="text-dark fs-5">@ViewBag.IdTransaccion</strong>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a asp-action="MisPedidos" asp-controller="Ordenes" class="btn btn-dark btn-lg">
+                <i class="bi bi-truck"></i> Ver mis envíos pendientes
+            </a>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">
+                Volver a la tienda
+            </a>
+        </div>
+    </div>
+</div>

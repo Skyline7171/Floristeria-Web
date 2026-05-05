@@ -105,6 +105,9 @@
 
 	<script>
 		$(document).ready(function () {
+			// CONSTANTE DE CONVERSIÓN (Tasa oficializada por el BCN)
+			const TASA_CAMBIO = 36.6243;
+
 			// INICIALIZAR LOS TOOLTIPS DE BOOTSTRAP
 			var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 			var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -146,25 +149,44 @@
 			paypal.Buttons({
 				style: { color: 'gold', shape: 'pill', label: 'pay' },
 				createOrder: function(data, actions) {
+					const totalCordobas = parseFloat('@Model.Total.ToString("F2").Replace(",", ".")');
+
+					const totalDolares = totalCordobas / TASA_CAMBIO;
+
+					const totalDolaresFormateado = totalDolares.toFixed(2);
+
 					return actions.order.create({
 						purchase_units: [{
 							amount: {
-								value: '@Model.Total.ToString("F2").Replace(",", ".")'
+								value: totalDolaresFormateado
 							}
 						}]
 					});
 				},
 				onApprove: function(data, actions) {
 					return actions.order.capture().then(function(detalles) {
+
+						const datosEnvio = {
+							idTransaccion: detalles.id,
+							nombreDestinatario: document.getElementById('NombreDestinatario').value,
+							apellidoDestinatario: document.getElementById('ApellidoDestinatario').value,
+							email: document.getElementById('Email').value,
+							telefono: document.getElementById('Telefono').value,
+							municipioId: parseInt(document.getElementById('cboMunicipio').value),
+							direccion: document.getElementById('Direccion').value
+						};
+
 						fetch('/Ordenes/ConfirmarPago', {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({
-								idTransaccion: detalles.id
-							})
+							body: JSON.stringify(datosEnvio)
 						}).then(response => {
 							if (response.ok) {
-								window.location.href = "/Ordenes/ConfirmacionExito";
+								// Redireccionamos a la página de éxito pasándole el ID de PayPal
+								window.location.href = "/Ordenes/ConfirmacionExito?idTransaccion=" + detalles.id;
+							}
+							else {
+								alert("Hubo un error al registrar tu orden en nuestro sistema.");
 							}
 						});
 					});

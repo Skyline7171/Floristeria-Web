@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using FloristeriaWeb.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,17 +24,17 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<UsuarioAplicacion> _signInManager;
+        private readonly UserManager<UsuarioAplicacion> _userManager;
+        private readonly IUserStore<UsuarioAplicacion> _userStore;
+        private readonly IUserEmailStore<UsuarioAplicacion> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<UsuarioAplicacion> userManager,
+            IUserStore<UsuarioAplicacion> userStore,
+            SignInManager<UsuarioAplicacion> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
@@ -74,6 +75,10 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            [Required(ErrorMessage = "El nombre es obligatorio.")]
+            [Display(Name = "Nombre")]
+            public string NombreCompleto { get; set; }
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
@@ -112,7 +117,13 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                // Creamos la instancia usando la clase extendida
+                var user = new UsuarioAplicacion
+                {
+                    UserName = Input.Email,
+                    Email = Input.Email,
+                    NombreCompleto = Input.NombreCompleto
+                };
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -168,13 +179,13 @@ namespace FloristeriaWeb.Areas.Identity.Pages.Account
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<UsuarioAplicacion> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<UsuarioAplicacion>)_userStore;
         }
     }
 }

@@ -6,6 +6,7 @@ using FloristeriaWeb.Datos;
 using FloristeriaWeb.Helpers;
 using FloristeriaWeb.Models;
 using FloristeriaWeb.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -175,12 +176,18 @@ namespace FloristeriaWeb.Controllers
         // GET: Ordenes/Checkout
         public async Task<IActionResult> Checkout()
         {
+            var usuario = await _userManager.GetUserAsync(User);
+            if (usuario == null)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+
             var carrito = HttpContext.Session.GetObjectFromJson<List<ElementoCarrito>>("CarritoFloreria");
             if (carrito == null || !carrito.Any()) return RedirectToAction("Index", "Home");
 
             ViewBag.Departamentos = await _context.Departamento.OrderBy(d => d.Nombre).ToListAsync();
 
-            var model = new CheckoutVM { Total = carrito.Sum(x => x.Importe) };
+            var model = new CheckoutVM { Email = usuario.Email, Total = carrito.Sum(x => x.Importe) };
             return View(model);
         }
 
@@ -197,29 +204,29 @@ namespace FloristeriaWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmarPago([FromBody] dynamic datos)
+        public async Task<IActionResult> ConfirmarPago([FromBody] ConfirmarPagoDTO modelo)
         {
-            // 1. Recuperar carrito y datos del Checkout de la sesión
+            var usuarioActual = await _userManager.GetUserAsync(User);
             var carrito = HttpContext.Session.GetObjectFromJson<List<ElementoCarrito>>("CarritoFloreria");
-            var checkoutInfo = HttpContext.Session.GetObjectFromJson<CheckoutVM>("InfoEnvio");
 
-            if (carrito == null || checkoutInfo == null) return BadRequest();
+            if (carrito == null) return BadRequest();
 
-            // 2. Crear el objeto Orden para la DB
             var orden = new Orden
             {
-                NombreDestinatario = checkoutInfo.NombreDestinatario,
-                ApellidoDestinatario = checkoutInfo.ApellidoDestinatario,
-                Email = checkoutInfo.Email,
-                Telefono = checkoutInfo.Telefono,
-                Direccion = checkoutInfo.Direccion,
-                MunicipioId = checkoutInfo.MunicipioId,
+                UsuarioId = usuarioActual.Id,
+                NombreDestinatario = modelo.NombreDestinatario,
+                ApellidoDestinatario = modelo.ApellidoDestinatario,
+                Email = modelo.Email,
+                Telefono = modelo.Telefono,
+                Direccion = modelo.Direccion,
+                MunicipioId = modelo.MunicipioId,
                 Total = carrito.Sum(x => x.Importe),
                 FechaOrden = DateTime.Now,
                 EstadoPagoId = 1, // "Pagado" o "Pendiente"
-                TransactionId = datos.idTransaccion // ID que viene de PayPal
+                TransactionId = modelo.IdTransaccion // ID que viene de PayPal
             };
 
+            // Crear el objeto Orden para la DB
             _context.Orden.Add(orden);
             await _context.SaveChangesAsync();
 
@@ -241,6 +248,72 @@ namespace FloristeriaWeb.Controllers
             HttpContext.Session.Remove("CarritoFloreria");
 
             return Ok(new { success = true });
+        }
+
+        // Acción para mostrar la pantalla de éxito
+        public IActionResult ConfirmacionExito(string idTransaccion)
+        {
+            ViewBag.IdTransaccion = idTransaccion;
+            return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> MisPedidos()
+        {
+            var usuarioActual = await _userManager.GetUserAsync(User);
+            if (usuarioActual == null) return Challenge();
+
+            // Traemos las órdenes del usuario e incluimos la relación del Municipio y su Departamento
+            var misOrdenes = await _context.Orden
+                .Include(o => o.Municipio)
+                    .ThenInclude(m => m.Departamento)
+                .Where(o => o.UsuarioId == usuarioActual.Id)
+                .OrderByDescending(o => o.FechaOrden)
+                .ToListAsync();
+
+            return View(misOrdenes);
+        }
+
+        [Authorize]
+        public async Task<IActionResult> DetallePedido(int id)
+        {
+            var usuarioActual = await _userManager.GetUserAsync(User);
+            if (usuarioActual == null) return Challenge();
+
+            // Buscamos la orden con todas sus relaciones necesarias
+            var orden = await _context.Orden
+                .Include(o => o.Municipio)
+                    .ThenInclude(m => m.Departamento)
+                .FirstOrDefaultAsync(o => o.Id == id && o.UsuarioId == usuarioActual.Id);
+
+            // Si la orden no existe o no le pertenece al usuario, lo redirigimos
+            if (orden == null)
+            {
+                return RedirectToAction("MisPedidos");
+            }
+
+            // Cargamos los productos (detalles) de esta orden de forma explícita
+            // Asumiendo que tu propiedad de navegación en la clase Orden se llama DetalleOrden
+            var detalles = await _context.DetalleOrden
+                .Include(d => d.Flor) // Para poder mostrar la foto, nombre y precio de la flor
+                .Where(d => d.OrdenId == id)
+                .ToListAsync();
+
+            // Pasamos los detalles a la vista mediante el ViewBag o puedes crear un ViewModel si lo prefieres
+            ViewBag.Detalles = detalles;
+
+            return View(orden);
+        }
+
+        public class ConfirmarPagoDTO
+        {
+            public string IdTransaccion { get; set; }
+            public string NombreDestinatario { get; set; }
+            public string ApellidoDestinatario { get; set; }
+            public string Email { get; set; }
+            public string Telefono { get; set; }
+            public int MunicipioId { get; set; }
+            public string Direccion { get; set; }
         }
     }
 }
