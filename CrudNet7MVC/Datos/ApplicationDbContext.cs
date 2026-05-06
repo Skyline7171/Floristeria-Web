@@ -413,7 +413,7 @@ namespace FloristeriaWeb.Datos
                     Activo = true,
                     CategoriaId = 4
                 },
-                // Flor especial con stock bajo para que pruebes tu nuevo buscador optimizado:
+                // Flor especial
                 new Flor
                 {
                     Id = 15,

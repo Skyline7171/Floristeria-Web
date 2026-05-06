@@ -211,7 +211,7 @@ namespace FloristeriaWeb.Controllers
 
             if (carrito == null || !carrito.Any()) return BadRequest();
 
-            // 1. Extraemos todos los IDs de las flores del carrito para buscarlas de un solo golpe
+            // Extraemos todos los IDs de las flores del carrito para buscarlas de un solo golpe
             var idsFlores = carrito.Select(x => x.FlorId).ToList();
 
             // Traemos todas las flores involucradas a memoria en una sola consulta limpia
@@ -219,7 +219,7 @@ namespace FloristeriaWeb.Controllers
                 .Where(f => idsFlores.Contains(f.Id))
                 .ToListAsync();
 
-            // 2. Creamos la orden principal
+            // Creamos la orden principal
             var orden = new Orden
             {
                 UsuarioId = usuarioActual.Id,
@@ -240,7 +240,7 @@ namespace FloristeriaWeb.Controllers
             // Guardamos la orden primero para que genere su ID de manera segura
             await _context.SaveChangesAsync();
 
-            // 3. Procesamos los detalles y el stock de forma puramente síncrona en memoria
+            // Procesamos los detalles y el stock de forma puramente síncrona en memoria
             foreach (var item in carrito)
             {
                 var detalle = new DetalleOrden
@@ -264,10 +264,10 @@ namespace FloristeriaWeb.Controllers
                 }
             }
 
-            // 4. Un único SaveChanges final para guardar todos los detalles y actualizar inventarios en un solo bloque de transacción
+            // Un único SaveChanges final para guardar todos los detalles y actualizar inventarios en un solo bloque de transacción
             await _context.SaveChangesAsync();
 
-            // 5. Limpiamos la sesión de manera segura
+            // Limpiamos la sesión de manera segura
             HttpContext.Session.SetObjectAsJson("CarritoFloreria", new List<ElementoCarrito>());
 
             return Json(new { success = true });
