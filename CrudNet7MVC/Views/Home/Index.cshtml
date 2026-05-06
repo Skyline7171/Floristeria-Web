@@ -1,7 +1,10 @@
-﻿@model IEnumerable<FloristeriaWeb.Models.Flor>
+﻿@using FloristeriaWeb.Helpers
+@model IEnumerable<FloristeriaWeb.Models.Flor>
 
 @{
     ViewData["Title"] = "Nuestras Flores";
+    // Recuperamos el carrito actual de la sesión para comparar contras las tarjetas
+    var carritoActual = Context.Session.GetObjectFromJson<List<ElementoCarrito>>("CarritoFloreria") ?? new List<ElementoCarrito>();
 }
 
 <!-- Banner de Bienvenida -->
@@ -21,12 +24,10 @@
         {
             <div class="col">
                 <div class="card h-100 shadow-sm border-0 transition-hover">
-                    <!-- Badge de Categoría -->
                     <div class="position-absolute p-2">
                         <span class="badge rounded-pill bg-dark opacity-75">@item.Categoria?.Nombre</span>
                     </div>
 
-                    <!-- Imagen del Producto -->
                     @if (!string.IsNullOrEmpty(item.ImagenUrl))
                     {
                         <img src="@item.ImagenUrl" class="card-img-top" alt="@item.Nombre" style="height: 250px; object-fit: cover;">
@@ -54,10 +55,31 @@
                     </div>
 
                     <div class="card-footer bg-transparent border-top-0 pb-3">
-                        <div class="d-grid gap-2">
-                            <a asp-controller="Carrito" asp-action="Agregar" asp-route-id="@item.Id" class="btn btn-outline-dark">
+
+                        @{
+                            // Buscamos si esta flor en específico ya está en el carrito del usuario
+                            var itemEnCarrito = carritoActual.FirstOrDefault(x => x.FlorId == item.Id);
+                            int cantidadEnCarrito = itemEnCarrito?.Cantidad ?? 0;
+                            bool yaEstaEnCarrito = cantidadEnCarrito > 0;
+                        }
+
+                        <div class="contenedor-compra" data-flor-id="@item.Id" data-stock="@item.Stock">
+
+                            <button type="button" class="btn btn-outline-dark w-100 btn-añadir-carrito @(yaEstaEnCarrito ? "d-none" : "")">
                                 <i class="bi bi-cart-plus"></i> Añadir al Carrito
-                            </a>
+                            </button>
+
+                            <div class="controles-cantidad @(yaEstaEnCarrito ? "d-flex" : "d-none") align-items-center justify-content-between border rounded p-1">
+                                <button type="button" class="btn btn-sm btn-outline-secondary border-0 btn-decrementar">
+                                    <i class="bi bi-dash-lg"></i>
+                                </button>
+                                <span class="fw-bold cantidad-actual text-dark">@cantidadEnCarrito</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary border-0 btn-incrementar">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+
+                            <small class="text-danger msg-limite d-block mt-1 text-center font-monospace small" style="display:none;"></small>
                         </div>
                     </div>
                 </div>

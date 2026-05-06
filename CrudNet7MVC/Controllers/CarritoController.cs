@@ -76,5 +76,44 @@ namespace FloristeriaWeb.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public IActionResult ActualizarCantidadAjax(int florId, int nuevaCantidad)
+        {
+            var carrito = HttpContext.Session.GetObjectFromJson<List<ElementoCarrito>>("CarritoFloreria") ?? new List<ElementoCarrito>();
+            var item = carrito.FirstOrDefault(x => x.FlorId == florId);
+
+            // Buscar la flor en DB solo para validar que no nos alteren el JS maliciosamente
+            var flor = _context.Flor.Find(florId);
+            if (flor == null) return Json(new { success = false, message = "Flor no encontrada" });
+
+            if (nuevaCantidad <= 0)
+            {
+                if (item != null) carrito.Remove(item);
+            }
+            else
+            {
+                // Validación de seguridad definitiva del lado del Servidor
+                if (nuevaCantidad > flor.Stock)
+                {
+                    return Json(new { success = false, message = $"Solo quedan {flor.Stock} unidades disponibles." });
+                }
+
+                if (item == null)
+                {
+                    carrito.Add(new ElementoCarrito { FlorId = florId, Cantidad = nuevaCantidad, Precio = flor.Precio, Nombre = flor.Nombre, ImagenUrl = flor.ImagenUrl });
+                }
+                else
+                {
+                    item.Cantidad = nuevaCantidad;
+                }
+            }
+
+            HttpContext.Session.SetObjectAsJson("CarritoFloreria", carrito);
+
+            // Devolvemos la suma total de artículos en el carrito para el contador global
+            int totalArticulos = carrito.Sum(x => x.Cantidad);
+            return Json(new { success = true, totalArticulos = totalArticulos });
+        }
     }
 }
