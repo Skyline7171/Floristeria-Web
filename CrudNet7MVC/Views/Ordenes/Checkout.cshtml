@@ -179,15 +179,23 @@
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify(datosEnvio)
-						}).then(response => {
-							if (response.ok) {
-								// Redireccionamos a la página de éxito pasándole el ID de PayPal
+						})
+						// PASO 1: Convertimos la respuesta HTTP cruda a un objeto JSON de JavaScript
+						.then(response => response.json())
+						// PASO 2: Ahora sí, recibimos ese JSON (que llamamos 'resultadoServer') y evaluamos
+						.then(resultadoServer => {
+							if (resultadoServer.success) {
+								// El servidor ya guardó todo y limpió la sesión de forma segura
 								window.location.href = "/Ordenes/ConfirmacionExito?idTransaccion=" + detalles.id;
+							} else {
+								alert("Hubo un error al procesar tu orden en el servidor.");
 							}
-							else {
-								alert("Hubo un error al registrar tu orden en nuestro sistema.");
-							}
+						})
+						.catch(error => {
+							console.error("Error crítico:", error);
+							alert("Error de conexión con el servidor.");
 						});
+
 					});
 				}
 			}).render('#paypal-button-container');

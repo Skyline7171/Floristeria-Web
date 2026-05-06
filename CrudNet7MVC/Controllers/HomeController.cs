@@ -17,13 +17,41 @@ namespace deleteafter.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Traemos solo las flores activas y que tengan stock
             var flores = await _context.Flor
                 .Include(f => f.Categoria)
                 .Where(f => f.Activo && f.Stock > 0)
                 .ToListAsync();
-                
+
+            ViewBag.Categorias = await _context.Categoria
+                .OrderBy(c => c.Nombre)
+                .ToListAsync();
+
             return View(flores);
+        }
+
+        [HttpPost]
+        public IActionResult FiltrarCatalogo(string buscar, int? categoriaId)
+        {
+            var query = _context.Flor
+                .Include(f => f.Categoria)
+                .Where(f => f.Stock > 0)
+                .AsQueryable();
+
+            // Filtro por Texto (Nombre)
+            if (!string.IsNullOrEmpty(buscar))
+            {
+                query = query.Where(f => f.Nombre.Contains(buscar));
+            }
+
+            // Filtro por Categoría
+            if (categoriaId.HasValue)
+            {
+                query = query.Where(f => f.CategoriaId == categoriaId.Value);
+            }
+
+            var listaFiltrada = query.ToList();
+
+            return PartialView("_CatalogoFlores", listaFiltrada);
         }
 
         public IActionResult Privacy()

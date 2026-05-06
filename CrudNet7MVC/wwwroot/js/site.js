@@ -106,4 +106,33 @@ $(document).ready(function () {
             }
         });
     }
+
+    // ==========================================
+    // SISTEMA DE BÚSQUEDA Y FILTRADO ASÍNCRONO
+    // ==========================================
+
+    let timerBusqueda;
+
+    // Escuchar cuando el usuario escribe en el buscador
+    $(document).on('input', '#input-busqueda', function () {
+        clearTimeout(timerBusqueda);
+        // Esperamos 300 milisegundos desde que dejó de escribir para mandar la petición (Debounce)
+        timerBusqueda = setTimeout(ejecutarFiltroCombinado, 300);
+    });
+
+    // Escuchar cuando el usuario cambia la categoría en el select
+    $(document).on('change', '#select-categoria', function () {
+        ejecutarFiltroCombinado();
+    });
+
+    function ejecutarFiltroCombinado() {
+        const textoBusqueda = $('#input-busqueda').val();
+        const idCategoria = $('#select-categoria').val();
+
+        // Enviamos las variables al backend de C#
+        $.post('/Home/FiltrarCatalogo', { buscar: textoBusqueda, categoriaId: idCategoria }, function (htmlResponse) {
+            // Reemplazamos el catálogo viejo con las nuevas tarjetas filtradas en tiempo real
+            $('#contenedor-catalogo-flores').html(htmlResponse);
+        });
+    }
 });

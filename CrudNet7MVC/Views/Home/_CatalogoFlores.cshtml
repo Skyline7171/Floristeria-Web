@@ -1,0 +1,72 @@
+﻿@using FloristeriaWeb.Helpers
+@using FloristeriaWeb.Models @* Ajusta a tu namespace real *@
+@model IEnumerable<FloristeriaWeb.Models.Flor>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 transition-hover">
+                <div class="position-absolute p-2">
+                    <span class="badge rounded-pill bg-dark opacity-75">@item.Categoria?.Nombre</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(item.ImagenUrl))
+                {
+                    <img src="@item.ImagenUrl" class="card-img-top" alt="@item.Nombre" style="height: 250px; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <i class="bi bi-image text-white fs-1"></i>
+                    </div>
+                }
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-bold">@item.Nombre</h5>
+                    <p class="card-text text-muted small flex-grow-1">
+                        @(item.Descripcion?.Length > 80 ? item.Descripcion.Substring(0, 80) + "..." : item.Descripcion)
+                    </p>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="fs-5 fw-bold text-success">C$ @item.Precio.ToString("N2")</span>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <small class="text-muted">@item.Stock disp.</small>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-top-0 pb-3">
+
+                    @{
+                        var carritoActual = Context.Session.GetObjectFromJson<List<ElementoCarrito>>("CarritoFloreria") ?? new List<ElementoCarrito>();
+
+                        var itemEnCarrito = carritoActual.FirstOrDefault(x => x.FlorId == item.Id);
+                        int cantidadEnCarrito = itemEnCarrito?.Cantidad ?? 0;
+                        bool yaEstaEnCarrito = cantidadEnCarrito > 0;
+                    }
+
+                    <div class="contenedor-compra" data-flor-id="@item.Id" data-stock="@item.Stock">
+
+                        <button type="button" class="btn btn-outline-dark w-100 btn-añadir-carrito @(yaEstaEnCarrito ? "d-none" : "")">
+                            <i class="bi bi-cart-plus"></i> Añadir al Carrito
+                        </button>
+
+                        <div class="controles-cantidad @(yaEstaEnCarrito ? "d-flex" : "d-none") align-items-center justify-content-between border rounded p-1">
+                            <button type="button" class="btn btn-sm btn-outline-secondary border-0 btn-decrementar">
+                                <i class="bi bi-dash-lg"></i>
+                            </button>
+                            <span class="fw-bold cantidad-actual text-dark">@cantidadEnCarrito</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary border-0 btn-incrementar">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+
+                        <small class="text-danger msg-limite d-block mt-1 text-center font-monospace small" style="display:none;"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

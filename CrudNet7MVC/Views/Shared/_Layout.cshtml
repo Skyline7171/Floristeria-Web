@@ -32,35 +32,32 @@
                             </a>
                         </li>
 
-                        <!-- SECCIÓN ADMINISTRATIVA (DROP DOWN PARA ORDEN) -->
-                        <li class="nav-item dropdown">
-
-                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                            {
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-info" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-gear-fill"></i> Gestión
                                 </a>
-                            }
-
-                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Categorias" asp-action="Index">
-                                        <i class="bi bi-tags"></i> Categorías
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Flores" asp-action="Index">
-                                        <i class="bi bi-flower3"></i> Inventario de Flores
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item" asp-controller="Ordenes" asp-action="Index">
-                                        <i class="bi bi-cart-check"></i> Pedidos / Órdenes
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Categorias" asp-action="Index">
+                                            <i class="bi bi-tags"></i> Categorías
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Flores" asp-action="Index">
+                                            <i class="bi bi-flower3"></i> Inventario de Flores
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Ordenes" asp-action="Index">
+                                            <i class="bi bi-cart-check"></i> Pedidos / Órdenes
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

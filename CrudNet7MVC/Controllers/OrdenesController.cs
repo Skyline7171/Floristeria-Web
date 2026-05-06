@@ -209,8 +209,17 @@ namespace FloristeriaWeb.Controllers
             var usuarioActual = await _userManager.GetUserAsync(User);
             var carrito = HttpContext.Session.GetObjectFromJson<List<ElementoCarrito>>("CarritoFloreria");
 
-            if (carrito == null) return BadRequest();
+            if (carrito == null || !carrito.Any()) return BadRequest();
 
+            // 1. Extraemos todos los IDs de las flores del carrito para buscarlas de un solo golpe
+            var idsFlores = carrito.Select(x => x.FlorId).ToList();
+
+            // Traemos todas las flores involucradas a memoria en una sola consulta limpia
+            var listaFloresInventario = await _context.Flor
+                .Where(f => idsFlores.Contains(f.Id))
+                .ToListAsync();
+
+            // 2. Creamos la orden principal
             var orden = new Orden
             {
                 UsuarioId = usuarioActual.Id,
@@ -223,14 +232,15 @@ namespace FloristeriaWeb.Controllers
                 Total = carrito.Sum(x => x.Importe),
                 FechaOrden = DateTime.Now,
                 EstadoPagoId = 1,
-                TransactionId = modelo.IdTransaccion // ID que viene de PayPal
+                TransactionId = modelo.IdTransaccion
             };
 
-            // Crear el objeto Orden para la DB
             _context.Orden.Add(orden);
+
+            // Guardamos la orden primero para que genere su ID de manera segura
             await _context.SaveChangesAsync();
 
-            // Guardar los Detalles de la Orden
+            // 3. Procesamos los detalles y el stock de forma puramente síncrona en memoria
             foreach (var item in carrito)
             {
                 var detalle = new DetalleOrden
@@ -242,25 +252,25 @@ namespace FloristeriaWeb.Controllers
                 };
                 _context.DetalleOrden.Add(detalle);
 
-                var florEnInventario = await _context.Flor.FindAsync(item.FlorId);
+                // Buscamos la flor en la lista que ya tenemos cargada localmente (sin ir a la DB)
+                var florEnInventario = listaFloresInventario.FirstOrDefault(f => f.Id == item.FlorId);
                 if (florEnInventario != null)
                 {
-                    // Restamos la cantidad comprada del stock actual
                     florEnInventario.Stock -= item.Cantidad;
-
-                    // Si por algún desfase el stock da negativo, lo nivelamos a 0
                     if (florEnInventario.Stock < 0)
                     {
                         florEnInventario.Stock = 0;
                     }
                 }
             }
+
+            // 4. Un único SaveChanges final para guardar todos los detalles y actualizar inventarios en un solo bloque de transacción
             await _context.SaveChangesAsync();
 
-            // 4. Limpiar carrito
-            HttpContext.Session.Remove("CarritoFloreria");
+            // 5. Limpiamos la sesión de manera segura
+            HttpContext.Session.SetObjectAsJson("CarritoFloreria", new List<ElementoCarrito>());
 
-            return Ok(new { success = true });
+            return Json(new { success = true });
         }
 
         // Acción para mostrar la pantalla de éxito

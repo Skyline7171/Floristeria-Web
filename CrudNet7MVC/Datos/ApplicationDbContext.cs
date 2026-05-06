@@ -22,6 +22,8 @@ namespace FloristeriaWeb.Datos
         public DbSet<Orden> Orden { get; set; }
 
 
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -240,6 +242,189 @@ namespace FloristeriaWeb.Datos
                 new Estado { Id = 3, Nombre = "En camino" },
                 new Estado { Id = 4, Nombre = "Entregado" },
                 new Estado { Id = 5, Nombre = "Cancelado" }
+            );
+
+            modelBuilder.Entity<Categoria>().HasData(
+                new Categoria { Id = 1, Nombre = "Arreglos Fúnebres", Descripcion = "Coronas, cruces y arreglos solemnes de condolencias.", Activo = true },
+                new Categoria { Id = 2, Nombre = "Ramos Románticos", Descripcion = "Ramos elegantes diseñados para expresar amor y aniversario.", Activo = true },
+                new Categoria { Id = 3, Nombre = "Detalles de Cumpleaños", Descripcion = "Arreglos alegres y coloridos para celebraciones especiales.", Activo = true },
+                new Categoria { Id = 4, Nombre = "Plantas Exóticas", Descripcion = "Plantas vivas y flores exóticas para interiores y decoración duradera.", Activo = true }
+            );
+
+            modelBuilder.Entity<Flor>().HasData(
+                // Categoría 1: Arreglos Fúnebres
+                new Flor
+                {
+                    Id = 1,
+                    Nombre = "Corona de Condolencias Imperial",
+                    Descripcion = "Elegante corona fúnebre con lirios blancos, rosas y follaje fino.",
+                    Precio = 2450.00m,
+                    Stock = 10,
+                    ImagenUrl = "https://cdnx.jumpseller.com/floresensantiago/image/64518186/thumb/300/300?1750020573",
+                    Activo = true,
+                    CategoriaId = 1
+                },
+                new Flor
+                {
+                    Id = 2,
+                    Nombre = "Cruz del Eterno Descanso",
+                    Descripcion = "Arreglo solemne en forma de cruz elaborado con claveles y rosas blancas.",
+                    Precio = 1800.00m,
+                    Stock = 8,
+                    ImagenUrl = "https://www.yaakunflores.com/uploads/arreglos/cruz-eterno-descanso.jpg",
+                    Activo = true,
+                    CategoriaId = 1
+                },
+                new Flor
+                {
+                    Id = 3,
+                    Nombre = "Cojín de Crisantemos y Lirios",
+                    Descripcion = "Almohadón floral fúnebre con crisantemos blancos y acentos de lila.",
+                    Precio = 1200.00m,
+                    Stock = 15,
+                    ImagenUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO2y9GVpniMB2Fmy26Ptsp0aSjl-J0NmtNWA&s",
+                    Activo = true,
+                    CategoriaId = 1
+                },
+
+                // Categoría 2: Ramos Románticos
+                new Flor
+                {
+                    Id = 4,
+                    Nombre = "Ramo de 24 Rosas Rojas Premium",
+                    Descripcion = "Clásico y majestuoso ramo de rosas rojas de tallo largo con envoltura de lujo.",
+                    Precio = 1500.00m,
+                    Stock = 30,
+                    ImagenUrl = "https://ponchycaprico.com/cdn/shop/files/RR003_24_cc29830d-f44b-4533-ab54-d9de13384b0b.jpg?v=1760662544&width=1946",
+                    Activo = true,
+                    CategoriaId = 2
+                },
+                new Flor
+                {
+                    Id = 5,
+                    Nombre = "Caja Corazón Romántico",
+                    Descripcion = "Caja premium en forma de corazón rellena de rosas rojas y bombones.",
+                    Precio = 1950.00m,
+                    Stock = 12,
+                    ImagenUrl = "https://www.floreriabloom.com/cdn/shop/files/arreglo-romantico-rosas-rojas-chocolates-bombones-delivery-lima.jpg?v=1775691296&width=2048",
+                    Activo = true,
+                    CategoriaId = 2
+                },
+                new Flor
+                {
+                    Id = 6,
+                    Nombre = "Ramo Suspiro de Amor",
+                    Descripcion = "Combinación delicada de rosas rosadas, astromelias y hortensias blancas.",
+                    Precio = 950.00m,
+                    Stock = 20,
+                    ImagenUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-XYaOTgZOnDhOapcBiwAoc5Sa4jnaYdqW-g&s",
+                    Activo = true,
+                    CategoriaId = 2
+                },
+                new Flor
+                {
+                    Id = 7,
+                    Nombre = "Eternidad de Tulipanes",
+                    Descripcion = "Fino ramo de tulipanes importados en tonos pastel perfectos para aniversarios.",
+                    Precio = 1750.00m,
+                    Stock = 6,
+                    ImagenUrl = "https://i.etsystatic.com/51995127/r/il/db9c41/6747189706/il_fullxfull.6747189706_56d6.jpg",
+                    Activo = true,
+                    CategoriaId = 2
+                },
+
+                // Categoría 3: Detalles de Cumpleaños
+                new Flor
+                {
+                    Id = 8,
+                    Nombre = "Florero Explosión Tropical",
+                    Descripcion = "Arreglo vibrante con aves del paraíso, gerberas brillantes y lirios amarillos.",
+                    Precio = 1100.00m,
+                    Stock = 18,
+                    ImagenUrl = "https://static.wixstatic.com/media/59f71b_e269d3d9c4384e9dbb533e1c36d4a982~mv2.jpg/v1/fill/w_480,h_480,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/59f71b_e269d3d9c4384e9dbb533e1c36d4a982~mv2.jpg",
+                    Activo = true,
+                    CategoriaId = 3
+                },
+                new Flor
+                {
+                    Id = 9,
+                    Nombre = "Cesta de Gerberas Sonrientes",
+                    Descripcion = "Cesta rústica con una colorida selección de gerberas multicolor para alegrar el día.",
+                    Precio = 850.00m,
+                    Stock = 25,
+                    ImagenUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEHEglquTwWYOQkBETwZ9_RkAMsADWGvDkSA&s",
+                    Activo = true,
+                    CategoriaId = 3
+                },
+                new Flor
+                {
+                    Id = 10,
+                    Nombre = "Girasoles Radiantes en Jarrón",
+                    Descripcion = "Jarrón de vidrio con espectaculares girasoles frescos acompañados de flores silvestres.",
+                    Precio = 980.00m,
+                    Stock = 15,
+                    ImagenUrl = "https://floresco.co/351-large_default/arreglo-con-girasoles-radiante.jpg",
+                    Activo = true,
+                    CategoriaId = 3
+                },
+                new Flor
+                {
+                    Id = 11,
+                    Nombre = "Dulce Deseo con Globos",
+                    Descripcion = "Arreglo mediano de flores variadas que incluye un globo metálico de feliz cumpleaños.",
+                    Precio = 1250.00m,
+                    Stock = 14,
+                    ImagenUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyOV2DZdrK1SN6rXuWF91D6qhYU4F67dIMeg&s",
+                    Activo = true,
+                    CategoriaId = 3
+                },
+
+                // Categoría 4: Plantas Exóticas
+                new Flor
+                {
+                    Id = 12,
+                    Nombre = "Orquídea Phalaenopsis Doble Tallo",
+                    Descripcion = "Elegante planta de orquídea blanca en maceta de cerámica, símbolo de sofisticación.",
+                    Precio = 1600.00m,
+                    Stock = 5,
+                    ImagenUrl = "https://casafloravivarium.com/cdn/shop/products/IMG_8598.jpg?v=1634678627&width=1024",
+                    Activo = true,
+                    CategoriaId = 4
+                },
+                new Flor
+                {
+                    Id = 13,
+                    Nombre = "Bonsái de la Abundancia",
+                    Descripcion = "Árbol bonsái de interiores ideal para oficinas o salas, fácil cuidado.",
+                    Precio = 1400.00m,
+                    Stock = 7,
+                    ImagenUrl = "https://www.shutterstock.com/image-illustration/3d-rendering-pink-blooming-sakura-600nw-2619492913.jpg",
+                    Activo = true,
+                    CategoriaId = 4
+                },
+                new Flor
+                {
+                    Id = 14,
+                    Nombre = "Maceta de Anturios Rojos",
+                    Descripcion = "Planta de interior con llamativas hojas rojas brillantes y duraderas.",
+                    Precio = 750.00m,
+                    Stock = 22,
+                    ImagenUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtRoZ-calbf552JjobqGm5MMCmy799KTUr9g&s",
+                    Activo = true,
+                    CategoriaId = 4
+                },
+                // Flor especial con stock bajo para que pruebes tu nuevo buscador optimizado:
+                new Flor
+                {
+                    Id = 15,
+                    Nombre = "Lirio de la Paz Premium",
+                    Descripcion = "Hermosa planta purificadora de aire con elegantes flores blancas de espata.",
+                    Precio = 680.00m,
+                    Stock = 2, // Stock mínimo para pruebas
+                    ImagenUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfupsVzWjkbughdoDl57xyi6R_aXFz1ZMc9Q&s",
+                    Activo = true,
+                    CategoriaId = 4
+                }
             );
         }
     }
