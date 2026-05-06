@@ -12,7 +12,7 @@ namespace FloristeriaWeb.Datos
             
         }
 
-        // Agregar los modelos aquí
+        // Recuerda agregar los modelos aquí para que sean cargados en la base de datos
         public DbSet<Categoria> Categoria { get; set; }
         public DbSet<Departamento> Departamento { get; set; }
         public DbSet<DetalleOrden> DetalleOrden { get; set; }

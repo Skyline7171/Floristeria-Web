@@ -222,7 +222,7 @@ namespace FloristeriaWeb.Controllers
                 MunicipioId = modelo.MunicipioId,
                 Total = carrito.Sum(x => x.Importe),
                 FechaOrden = DateTime.Now,
-                EstadoPagoId = 1, // "Pagado" o "Pendiente"
+                EstadoPagoId = 1,
                 TransactionId = modelo.IdTransaccion // ID que viene de PayPal
             };
 
@@ -230,7 +230,7 @@ namespace FloristeriaWeb.Controllers
             _context.Orden.Add(orden);
             await _context.SaveChangesAsync();
 
-            // 3. Guardar los Detalles de la Orden
+            // Guardar los Detalles de la Orden
             foreach (var item in carrito)
             {
                 var detalle = new DetalleOrden
@@ -248,7 +248,7 @@ namespace FloristeriaWeb.Controllers
                     // Restamos la cantidad comprada del stock actual
                     florEnInventario.Stock -= item.Cantidad;
 
-                    // Medida de seguridad: Si por algún desfase el stock da negativo, lo nivelamos a 0
+                    // Si por algún desfase el stock da negativo, lo nivelamos a 0
                     if (florEnInventario.Stock < 0)
                     {
                         florEnInventario.Stock = 0;
@@ -306,13 +306,12 @@ namespace FloristeriaWeb.Controllers
             }
 
             // Cargamos los productos (detalles) de esta orden de forma explícita
-            // Asumiendo que tu propiedad de navegación en la clase Orden se llama DetalleOrden
             var detalles = await _context.DetalleOrden
                 .Include(d => d.Flor) // Para poder mostrar la foto, nombre y precio de la flor
                 .Where(d => d.OrdenId == id)
                 .ToListAsync();
 
-            // Pasamos los detalles a la vista mediante el ViewBag o puedes crear un ViewModel si lo prefieres
+            // Pasamos los detalles a la vista mediante el ViewBag
             ViewBag.Detalles = detalles;
 
             return View(orden);

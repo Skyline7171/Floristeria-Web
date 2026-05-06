@@ -105,10 +105,9 @@
 
 	<script>
 		$(document).ready(function () {
-			// CONSTANTE DE CONVERSIÓN (Tasa oficializada por el BCN)
+			// Tasa oficializada por el BCN
 			const TASA_CAMBIO = 36.6243;
 
-			// INICIALIZAR LOS TOOLTIPS DE BOOTSTRAP
 			var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
 			var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
 				return new bootstrap.Tooltip(tooltipTriggerEl)

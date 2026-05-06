@@ -19,7 +19,7 @@ namespace FloristeriaWeb.Models
         public Flor? Flor { get; set; }
 
         [Range(1, 1000, ErrorMessage = "La cantidad debe estar entre 1 y 1000")]
-        public int Cantidad { get; set; } // Cambiado a int por lógica de unidades
+        public int Cantidad { get; set; }
 
         [Required(ErrorMessage = "El precio unitario es obligatorio")]
         [Column(TypeName = "decimal(18,2)")]
